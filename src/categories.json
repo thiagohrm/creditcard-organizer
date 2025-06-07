@@ -1,0 +1,8 @@
+{
+    "market": ["benedete", "imperio", "market", "delta", "assai", "lojao", "americanas"],
+    "health": ["drogal", "remedio", "saude", "raia", "drogasil", "pague menos"],
+    "online services": ["netflix", "youtube premium", "google one", "ifood", "microsoft", "office", "apple", "melimais"],
+    "restaurants": ["restaurante", "burger", "mcdonalds", "kissburgers", "lanchonete", "esfirraria", "churros"],
+    "automotive": ["posto", "nutag", "abastece", "abasteceai", "estacionamento", "f park"],
+    "taxes": ["pagamento recebido", "txentregvisto"]
+}
