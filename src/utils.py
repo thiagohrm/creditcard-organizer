@@ -106,8 +106,9 @@ def generate_pdf(input_file, categorized_transactions):
 
             # Plot
             fig2, ax2 = plt.subplots(figsize=(5, 2.5))
-            ax2.bar(date_group['date'].dt.strftime('%Y-%m-%d'), y, color='skyblue', label='Amount')
-            ax2.plot(date_group['date'].dt.strftime('%Y-%m-%d'), trend, color='red', linewidth=2, label='Trend')
+            formatted_dates = date_group['date'].dt.strftime('%Y-%m-%d')
+            ax2.bar(formatted_dates, y, color='skyblue', label='Amount')
+            ax2.plot(formatted_dates, trend, color='red', linewidth=2, label='Trend')
             ax2.set_title(f"Spending Trend for {category.capitalize()}")
             ax2.set_xlabel("Date")
             ax2.set_ylabel("Amount")
