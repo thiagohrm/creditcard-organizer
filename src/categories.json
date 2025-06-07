@@ -1,8 +1,13 @@
 {
     "market": ["benedete", "imperio", "market", "delta", "assai", "lojao", "americanas"],
     "health": ["drogal", "remedio", "saude", "raia", "drogasil", "pague menos", "ervanario"],
-    "online services": ["netflix", "youtube premium", "google one", "ifood", "microsoft", "office", "apple", "melimais"],
+    "online services": ["netflix", "youtube", "google one", "ifood", "microsoft", "office", "apple", "melimais"],
     "restaurants": ["restaurante", "burger", "mcdonalds", "kissburgers", "lanchonete", "esfirraria", "churros", "real", "pandurata"],
     "automotive": ["posto", "nutag", "abastece", "abasteceai", "estacionamento", "f park"],
-    "taxes": ["pagamento recebido", "txentregvisto"]
+    "taxes": ["pagamento recebido", "txentregvisto"],
+    "utilities": ["energia", "agua", "luz", "telefonia", "internet", "celular", "claro", "vivo", "oi", "tim"],
+    "transportation": ["uber", "99", "cabify", "taxi", "transporte", "onibus", "metro", "trem"],
+    "entertainment": ["cinema", "show", "teatro", "evento", "festival", "museu", "parque"],
+    "clothing": ["roupa", "vestuario", "moda", "sapato", "calçado", "acessorios", "loja de roupas"],
+    "electronics": ["eletronicos", "tecnologia", "celular", "computador", "notebook", "tablet", "smartphone", "iphone"]
 }
