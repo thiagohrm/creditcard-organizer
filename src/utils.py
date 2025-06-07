@@ -5,6 +5,7 @@ from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet
 import matplotlib.pyplot as plt
 import io
+import numpy as np
 
 def read_csv(file_path):
     return pd.read_csv(file_path)
@@ -84,6 +85,46 @@ def generate_pdf(input_file, categorized_transactions):
         cat_df = categorized_transactions[categorized_transactions['category'] == category]
         # Sort transactions in this category by amount descending
         cat_df = cat_df.sort_values(by='amount', ascending=False)
+
+        # --- Bar chart with trend line for this category ---
+        if not cat_df.empty:
+            # Group by date and sum
+            date_group = cat_df.groupby('date')['amount'].sum().reset_index()
+            # Sort by date
+            date_group['date'] = pd.to_datetime(date_group['date'])
+            date_group = date_group.sort_values('date')
+            # Prepare data
+            x = np.arange(len(date_group))
+            y = date_group['amount'].values
+            # Trend line
+            if len(x) > 1:
+                z = np.polyfit(x, y, 1)
+                p = np.poly1d(z)
+                trend = p(x)
+            else:
+                trend = y
+
+            # Plot
+            fig2, ax2 = plt.subplots(figsize=(5, 2.5))
+            formatted_dates = date_group['date'].dt.strftime('%Y-%m-%d')
+            ax2.bar(formatted_dates, y, color='skyblue', label='Amount')
+            ax2.plot(formatted_dates, trend, color='red', linewidth=2, label='Trend')
+            ax2.set_title(f"Spending Trend for {category.capitalize()}")
+            ax2.set_xlabel("Date")
+            ax2.set_ylabel("Amount")
+            ax2.tick_params(axis='x', rotation=45)
+            ax2.legend()
+            plt.tight_layout()
+
+            # Save to buffer
+            bar_buffer = io.BytesIO()
+            plt.savefig(bar_buffer, format='PNG')
+            plt.close(fig2)
+            bar_buffer.seek(0)
+            elements.append(Image(bar_buffer, width=350, height=150))
+            elements.append(Spacer(1, 8))
+
+        # --- Transactions table ---
         trans_data = [['Date', 'Title', 'Amount']]
         for _, row in cat_df.iterrows():
             trans_data.append([row['date'], row['title'], f"{row['amount']:.2f}"])
