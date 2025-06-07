@@ -1,6 +1,6 @@
 # Credit Card Organizer
 
-This project is designed to help users organize their credit card transactions by categorizing them into predefined categories such as restaurants, market, health, taxes, automotive, and online services. The application reads a CSV file containing transaction data, filters out negative amounts, and outputs a new CSV file with organized transactions.
+This project helps users organize their credit card transactions by categorizing them into customizable categories (such as restaurants, market, health, taxes, automotive, online services, and more). The application reads a CSV file containing transaction data, filters out negative amounts, and outputs both a new CSV file and a PDF report with organized transactions, summary tables, and a pie chart.
 
 ## Project Structure
 
@@ -9,7 +9,8 @@ creditcard-organizer
 ├── src
 │   ├── main.py            # Entry point of the application
 │   ├── categorizer.py     # Contains the TransactionCategorizer class
-│   ├── utils.py           # Utility functions for CSV handling
+│   ├── utils.py           # Utility functions for CSV and PDF handling
+│   ├── categories.json    # (Optional) Custom categories and keywords
 │   └── categories
 │       └── __init__.py    # Initializer for the categories module
 ├── requirements.txt       # Lists project dependencies
@@ -34,11 +35,40 @@ creditcard-organizer
 To run the application, execute the following command in your terminal:
 
 ```
-python src/main.py <input_csv_file> <output_csv_file>
+python src/main.py <input_csv_file>
 ```
 
 - `<input_csv_file>`: Path to the input CSV file containing the credit card transactions.
-- `<output_csv_file>`: Path where the organized transactions will be saved.
+
+**Output:**  
+- A new CSV file named `<input_csv_file>-organized.csv` will be created with an added `category` column.
+- A PDF report named `<input_csv_file>.pdf` will be generated, containing:
+  - A summary table of categories and their percentages.
+  - A pie chart ("pizza graphic") of spending by category.
+  - Detailed tables of transactions for each category, all sorted from highest to lowest amount.
+
+## Custom Categories
+
+You can define your own categories and keywords by editing or creating a `categories.json` file in the `src` directory.  
+Example format:
+
+```json
+{
+    "market": ["benedete", "imperio", "market", "delta", "assai", "lojao", "americanas"],
+    "health": ["drogal", "remedio", "saude", "raia", "drogasil", "pague menos", "ervanario"],
+    "online services": ["netflix", "youtube", "google one", "ifood", "microsoft", "office", "apple", "melimais"],
+    "restaurants": ["restaurante", "burger", "mcdonalds", "kissburgers", "lanchonete", "esfirraria", "churros", "real", "pandurata"],
+    "automotive": ["posto", "nutag", "abastece", "abasteceai", "estacionamento", "f park"],
+    "taxes": ["pagamento recebido", "txentregvisto"],
+    "utilities": ["energia", "agua", "luz", "telefonia", "internet", "celular", "claro", "vivo", "oi", "tim"],
+    "transportation": ["uber", "99", "cabify", "taxi", "transporte", "onibus", "metro", "trem"],
+    "entertainment": ["cinema", "show", "teatro", "evento", "festival", "museu", "parque"],
+    "clothing": ["roupa", "vestuario", "moda", "sapato", "calçado", "acessorios", "loja de roupas"],
+    "electronics": ["eletronicos", "tecnologia", "celular", "computador", "notebook", "tablet", "smartphone", "iphone"]
+}
+```
+
+If `categories.json` is present, it will be used automatically.
 
 ## Example
 
@@ -58,6 +88,19 @@ date,title,amount,category
 2025-05-01,Restaurant A,50.00,restaurants
 2025-05-02,Market B,30.00,market
 ```
+
+### Output PDF
+
+- First page: Pie chart and summary table of categories and their percentages.
+- Second page: Transactions for each category, sorted from highest to lowest amount.
+
+## Features
+
+- **Automatic categorization** of transactions using customizable keywords.
+- **Negative amounts** are filtered out automatically.
+- **Custom categories** via `categories.json` (no code changes needed).
+- **CSV and PDF output**: Organized CSV and a detailed PDF report with summary, pie chart, and detailed tables.
+- **All tables and charts are sorted** from highest to lowest amount for clarity.
 
 ## Contributing
 
