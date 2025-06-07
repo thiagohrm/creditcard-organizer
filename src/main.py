@@ -12,8 +12,12 @@ def main():
     # Read transactions from the input CSV file
     transactions = read_csv(args.input_file)
     
-    # Create an instance of TransactionCategorizer
-    categorizer = TransactionCategorizer()
+    # Use categories.json if it exists
+    categories_json_path = os.path.join(os.path.dirname(__file__), 'categories.json')
+    if os.path.exists(categories_json_path):
+        categorizer = TransactionCategorizer(categories_json_path)
+    else:
+        categorizer = TransactionCategorizer()
     
     # Categorize transactions
     categorized_transactions = categorizer.categorize_transactions(transactions)
