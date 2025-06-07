@@ -1,8 +1,8 @@
 {
     "market": ["benedete", "imperio", "market", "delta", "assai", "lojao", "americanas"],
-    "health": ["drogal", "remedio", "saude", "raia", "drogasil", "pague menos"],
+    "health": ["drogal", "remedio", "saude", "raia", "drogasil", "pague menos", "ervanario"],
     "online services": ["netflix", "youtube premium", "google one", "ifood", "microsoft", "office", "apple", "melimais"],
-    "restaurants": ["restaurante", "burger", "mcdonalds", "kissburgers", "lanchonete", "esfirraria", "churros"],
+    "restaurants": ["restaurante", "burger", "mcdonalds", "kissburgers", "lanchonete", "esfirraria", "churros", "real", "pandurata"],
     "automotive": ["posto", "nutag", "abastece", "abasteceai", "estacionamento", "f park"],
     "taxes": ["pagamento recebido", "txentregvisto"]
 }
