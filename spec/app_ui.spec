@@ -5,8 +5,11 @@ a = Analysis(
     ['../src/app_ui.py'],
     pathex=[],
     binaries=[],
-    datas=[],
-    hiddenimports=[],
+    datas=[('../src/*.json', '.'),],
+    hiddenimports=[
+        'numpy', 'pandas', 'matplotlib', 'matplotlib.backends.backend_tkagg',
+        'matplotlib.pyplot', 'tkinter', 'tkinter.filedialog', 'tkinter.messagebox'
+    ],
     hookspath=[],
     runtime_hooks=[],
     excludes=[],
