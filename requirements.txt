@@ -2,3 +2,4 @@ pandas
 reportlab
 matplotlib
 numpy
+pyinstaller

@@ -16,3 +16,14 @@ def test_categorize_transactions_removes_negative():
     result = categorizer.categorize_transactions(df)
     assert len(result) == 1
     assert result.iloc[0]['category'] == "restaurants"
+
+def test_categorize_transactions_with_custom_categories(tmp_path):
+    categories = {
+        "coffee": ["starbucks", "cafe"]
+    }
+    json_path = tmp_path / "categories.json"
+    import json
+    with open(json_path, "w") as f:
+        json.dump(categories, f)
+    categorizer = TransactionCategorizer(str(json_path))
+    assert categorizer.categorize_title("Starbucks Paulista") == "coffee"
