@@ -24,6 +24,7 @@ class CreditCardOrganizerApp(tk.Tk):
         self.upload_tab = ttk.Frame(self.notebook)
         self.summary_tab = ttk.Frame(self.notebook)
         self.details_tab = ttk.Frame(self.notebook)
+        self.stores_tab = ttk.Frame(self.notebook)  # New tab for stores
 
         self.notebook.add(self.upload_tab, text='Upload CSV')
         # Do NOT add summary and details tabs here
@@ -31,6 +32,7 @@ class CreditCardOrganizerApp(tk.Tk):
         self.create_upload_tab()
         self.create_summary_tab()
         self.create_details_tab()
+        self.create_stores_tab()  # Create stores tab
 
     def create_upload_tab(self):
         label = ttk.Label(self.upload_tab, text="Upload your credit card CSV file(s):")
@@ -61,6 +63,12 @@ class CreditCardOrganizerApp(tk.Tk):
         self.details_notebook = ttk.Notebook(self.details_tab)
         self.details_notebook.pack(fill='both', expand=True)
 
+    def create_stores_tab(self):
+        self.stores_canvas = None
+        # Frame for store statistics
+        self.stores_frame = ttk.Frame(self.stores_tab)
+        self.stores_frame.pack(fill='both', expand=True)
+
     def upload_csv(self):
         file_paths = filedialog.askopenfilenames(filetypes=[("CSV Files", "*.csv")])
         if not file_paths:
@@ -86,8 +94,11 @@ class CreditCardOrganizerApp(tk.Tk):
                 self.notebook.add(self.summary_tab, text='Summary')
             if self.details_tab not in self.notebook.tabs():
                 self.notebook.add(self.details_tab, text='Details')
+            if self.stores_tab not in self.notebook.tabs():  # Check for stores tab
+                self.notebook.add(self.stores_tab, text='Stores')  # Add stores tab
             self.show_summary()
             self.show_details()
+            self.show_stores()  # Show stores data
             self.notebook.select(self.summary_tab)
             self.processing_label.config(text="")  # Clear processing message
         except Exception as e:
@@ -101,7 +112,7 @@ class CreditCardOrganizerApp(tk.Tk):
         self.current_csvs = []
         self.transactions_list = []
         # Remove summary and details tabs if present
-        for tab in [self.summary_tab, self.details_tab]:
+        for tab in [self.summary_tab, self.details_tab, self.stores_tab]:
             try:
                 self.notebook.forget(tab)
             except tk.TclError:
@@ -218,6 +229,51 @@ class CreditCardOrganizerApp(tk.Tk):
             for _, row in cat_df.iterrows():
                 tree.insert('', 'end', values=(row['date'], row['title'], f"{row['amount']:.2f}"))
             tree.pack(fill='both', expand=True)
+
+    def show_stores(self):
+        for widget in self.stores_tab.winfo_children():
+            widget.destroy()
+        if self.categorized_transactions is None:
+            return
+
+        stores = self.categorized_transactions.groupby('title')['amount'].sum().reset_index()
+        stores = stores.sort_values(by='amount', ascending=False)
+        top_n = 15  # Show top 15 stores, group the rest as "Others"
+        if len(stores) > top_n:
+            top_stores = stores.iloc[:top_n]
+            others = pd.DataFrame([{
+                'title': 'Others',
+                'amount': stores.iloc[top_n:]['amount'].sum()
+            }])
+            stores = pd.concat([top_stores, others], ignore_index=True)
+
+        # Pie chart
+        fig, ax = plt.subplots(figsize=(5, 5))
+        ax.pie(
+            stores['amount'],
+            labels=stores['title'],
+            autopct='%1.0f%%',
+            startangle=90,
+            colors=plt.cm.Paired.colors
+        )
+        ax.set_title('Amounts per Store')
+        plt.tight_layout()
+        canvas = FigureCanvasTkAgg(fig, master=self.stores_tab)
+        canvas.draw()
+        canvas.get_tk_widget().pack(pady=10)
+        plt.close(fig)
+
+        # Table
+        table_frame = ttk.Frame(self.stores_tab)
+        table_frame.pack(fill='x', padx=10, pady=10)
+        cols = ['Store', 'Total Amount']
+        tree = ttk.Treeview(table_frame, columns=cols, show='headings', height=15)
+        for col in cols:
+            tree.heading(col, text=col)
+            tree.column(col, anchor='center')
+        for _, row in stores.iterrows():
+            tree.insert('', 'end', values=(row['title'], f"{row['amount']:.2f}"))
+        tree.pack(fill='x')
 
     def export_pdf_dialog(self):
         if self.categorized_transactions is None or self.summary is None:
