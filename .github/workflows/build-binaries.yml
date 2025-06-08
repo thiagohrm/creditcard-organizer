@@ -2,7 +2,7 @@ name: Build Standalone Binaries
 
 on:
   push:
-    branches: [ master ]
+    tags: [ '*' ]
   pull_request:
     branches: [ master ]
 
