@@ -24,13 +24,13 @@ jobs:
 
       - name: Build Windows executable with PyInstaller
         run: |
-          pyinstaller spec/app_ui.spec
+          pyinstaller spec\app_ui.spec
 
       - name: Upload Windows binary
         uses: actions/upload-artifact@v4
         with:
           name: creditcard-organizer-windows
-          path: dist/creditcard-organizer.exe
+          path: dist\creditcard-organizer.exe
 
   build-linux:
     runs-on: ubuntu-latest
