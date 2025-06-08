@@ -25,8 +25,7 @@ class CreditCardOrganizerApp(tk.Tk):
         self.details_tab = ttk.Frame(self.notebook)
 
         self.notebook.add(self.upload_tab, text='Upload CSV')
-        self.notebook.add(self.summary_tab, text='Summary')
-        self.notebook.add(self.details_tab, text='Details')
+        # Do NOT add summary and details tabs here
 
         self.create_upload_tab()
         self.create_summary_tab()
@@ -37,6 +36,9 @@ class CreditCardOrganizerApp(tk.Tk):
         label.pack(pady=20)
         upload_btn = ttk.Button(self.upload_tab, text="Select CSV", command=self.upload_csv)
         upload_btn.pack()
+        # Clean Data button
+        clean_btn = ttk.Button(self.upload_tab, text="Clean Data", command=self.clean_data)
+        clean_btn.pack(pady=5)
         # Label to show current CSV file
         self.csv_label = ttk.Label(self.upload_tab, text="No CSV loaded.")
         self.csv_label.pack(pady=10)
@@ -62,7 +64,6 @@ class CreditCardOrganizerApp(tk.Tk):
         file_path = filedialog.askopenfilename(filetypes=[("CSV Files", "*.csv")])
         if not file_path:
             return
-        # Show selected file
         self.csv_label.config(text=f"Current CSV: {os.path.basename(file_path)}")
         self.processing_label.config(text="Processing...", foreground="blue")
         self.update_idletasks()
@@ -75,6 +76,11 @@ class CreditCardOrganizerApp(tk.Tk):
                 categorizer = TransactionCategorizer()
             self.categorized_transactions = categorizer.categorize_transactions(transactions)
             self.current_csv = file_path
+            # Add summary and details tabs if not present
+            if self.summary_tab not in self.notebook.tabs():
+                self.notebook.add(self.summary_tab, text='Summary')
+            if self.details_tab not in self.notebook.tabs():
+                self.notebook.add(self.details_tab, text='Details')
             self.show_summary()
             self.show_details()
             self.notebook.select(self.summary_tab)
@@ -82,6 +88,21 @@ class CreditCardOrganizerApp(tk.Tk):
         except Exception as e:
             self.processing_label.config(text="")
             messagebox.showerror("Error", f"Failed to process file: {e}")
+
+    def clean_data(self):
+        # Remove data from memory
+        self.categorized_transactions = None
+        self.summary = None
+        self.current_csv = None
+        # Remove summary and details tabs if present
+        for tab in [self.summary_tab, self.details_tab]:
+            try:
+                self.notebook.forget(tab)
+            except tk.TclError:
+                pass
+        # Reset labels
+        self.csv_label.config(text="No CSV loaded.")
+        self.processing_label.config(text="")
 
     def show_summary(self):
         # Only clear dynamic content, not the export button
