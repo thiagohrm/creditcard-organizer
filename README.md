@@ -35,17 +35,10 @@ creditcard-organizer
 To run the application, execute the following command in your terminal:
 
 ```
-python src/main.py <input_csv_file>
+python src/app_ui.py
 ```
 
-- `<input_csv_file>`: Path to the input CSV file containing the credit card transactions.
-
-**Output:**  
-- A new CSV file named `<input_csv_file>-organized.csv` will be created with an added `category` column.
-- A PDF report named `<input_csv_file>.pdf` will be generated, containing:
-  - A summary table of categories and their percentages.
-  - A pie chart ("pizza graphic") of spending by category.
-  - Detailed tables of transactions for each category, all sorted from highest to lowest amount.
+This will launch the graphical user interface (GUI) for uploading your CSV, viewing charts, and exporting reports.
 
 ## Custom Categories
 
