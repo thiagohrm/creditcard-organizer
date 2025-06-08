@@ -15,6 +15,7 @@ class CreditCardOrganizerApp(tk.Tk):
         self.geometry("1000x700")
         self.categorized_transactions = None
         self.summary = None
+        self.current_csv = None  # Track current CSV file path
 
         self.notebook = ttk.Notebook(self)
         self.notebook.pack(fill='both', expand=True)
@@ -36,6 +37,12 @@ class CreditCardOrganizerApp(tk.Tk):
         label.pack(pady=20)
         upload_btn = ttk.Button(self.upload_tab, text="Select CSV", command=self.upload_csv)
         upload_btn.pack()
+        # Label to show current CSV file
+        self.csv_label = ttk.Label(self.upload_tab, text="No CSV loaded.")
+        self.csv_label.pack(pady=10)
+        # Label to show processing status
+        self.processing_label = ttk.Label(self.upload_tab, text="", foreground="blue")
+        self.processing_label.pack(pady=5)
 
     def create_summary_tab(self):
         self.summary_canvas = None
@@ -55,6 +62,10 @@ class CreditCardOrganizerApp(tk.Tk):
         file_path = filedialog.askopenfilename(filetypes=[("CSV Files", "*.csv")])
         if not file_path:
             return
+        # Show selected file
+        self.csv_label.config(text=f"Current CSV: {os.path.basename(file_path)}")
+        self.processing_label.config(text="Processing...", foreground="blue")
+        self.update_idletasks()
         try:
             transactions = read_csv(file_path)
             categories_json_path = os.path.join(os.path.dirname(__file__), 'categories.json')
@@ -63,10 +74,13 @@ class CreditCardOrganizerApp(tk.Tk):
             else:
                 categorizer = TransactionCategorizer()
             self.categorized_transactions = categorizer.categorize_transactions(transactions)
+            self.current_csv = file_path
             self.show_summary()
             self.show_details()
             self.notebook.select(self.summary_tab)
+            self.processing_label.config(text="")  # Clear processing message
         except Exception as e:
+            self.processing_label.config(text="")
             messagebox.showerror("Error", f"Failed to process file: {e}")
 
     def show_summary(self):
