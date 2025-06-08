@@ -252,7 +252,7 @@ class CreditCardOrganizerApp(tk.Tk):
             .reset_index()
         )
         stores = stores.sort_values(by='amount', ascending=False)
-        top_n = 15  # Show top 15 stores, group the rest as "Others"
+        top_n = 30  # Show top 30 stores, group the rest as "Others"
         if len(stores) > top_n:
             top_stores = stores.iloc[:top_n]
             others = pd.DataFrame([{
