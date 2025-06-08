@@ -281,6 +281,19 @@ class CreditCardOrganizerApp(tk.Tk):
             tree.insert('', 'end', values=(row['title'], f"{row['amount']:.2f}"))
         tree.pack(fill='x')
 
+        # Bind double-click event
+        def on_store_double_click(event):
+            selected = tree.selection()
+            if not selected:
+                return
+            store = tree.item(selected[0])['values'][0]
+            if store == "Others":
+                messagebox.showinfo("Info", "Cannot show details for 'Others'.")
+                return
+            self.show_store_transactions(store)
+
+        tree.bind("<Double-1>", on_store_double_click)
+
     def export_pdf_dialog(self):
         if self.categorized_transactions is None or self.summary is None:
             messagebox.showwarning("No Data", "Please upload and process a CSV first.")
@@ -362,6 +375,25 @@ class CreditCardOrganizerApp(tk.Tk):
         ]))
         elements.append(trans_table)
         doc.build(elements)
+
+    def show_store_transactions(self, store_name):
+        win = tk.Toplevel(self)
+        win.title(f"Transactions for {store_name}")
+        win.geometry("600x400")
+
+        # Filter transactions for this store
+        df = self.categorized_transactions[self.categorized_transactions['title'] == store_name]
+        df = df.sort_values(by='date')
+
+        # Table
+        cols = ['Date', 'Title', 'Amount', 'Category']
+        tree = ttk.Treeview(win, columns=cols, show='headings', height=20)
+        for col in cols:
+            tree.heading(col, text=col)
+            tree.column(col, anchor='center')
+        for _, row in df.iterrows():
+            tree.insert('', 'end', values=(row['date'], row['title'], f"{row['amount']:.2f}", row.get('category', '')))
+        tree.pack(fill='both', expand=True, padx=10, pady=10)
 
 class CategoryExportDialog(tk.Toplevel):
     def __init__(self, parent, categories):
