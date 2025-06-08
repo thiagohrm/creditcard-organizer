@@ -6,6 +6,7 @@ from reportlab.lib.styles import getSampleStyleSheet
 import matplotlib.pyplot as plt
 import io
 import numpy as np
+import re
 
 def read_csv(file_path):
     return pd.read_csv(file_path)
@@ -137,3 +138,36 @@ def generate_pdf(input_file, categorized_transactions):
         elements.append(trans_table)
         elements.append(Spacer(1, 12))
     doc.build(elements)
+
+def merge_installments(df):
+    """
+    Merge transactions with 'Parcela X/Y' in the title, summing their amounts.
+    Keeps other transactions unchanged.
+    """
+    # Extract base title (without 'Parcela X/Y')
+    def base_title(title):
+        match = re.match(r"(.+?)\s+Parcela\s+\d+/\d+", title, re.IGNORECASE)
+        return match.group(1).strip() if match else title.strip()
+
+    df = df.copy()
+    df['base_title'] = df['title'].apply(base_title)
+    df['is_parcela'] = df['title'].str.contains(r'Parcela \d+/\d+', case=False, regex=True)
+
+    # Group by base_title if it's an installment, else keep as is
+    parcela_df = df[df['is_parcela']]
+    non_parcela_df = df[~df['is_parcela']]
+
+    if not parcela_df.empty:
+        # For installments, sum amounts and keep the earliest date
+        merged = parcela_df.groupby('base_title').agg({
+            'amount': 'sum',
+            'date': 'min'
+        }).reset_index()
+        merged['title'] = merged['base_title']
+        merged = merged[['date', 'title', 'amount']]
+        # Combine with non-installment transactions
+        result = pd.concat([non_parcela_df[['date', 'title', 'amount']], merged], ignore_index=True)
+    else:
+        result = df[['date', 'title', 'amount']]
+
+    return result

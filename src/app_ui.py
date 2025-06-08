@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 from categorizer import TransactionCategorizer
-from utils import read_csv, generate_pdf, write_csv
+from utils import read_csv, generate_pdf, merge_installments
 from tkinter import simpledialog
 import os
 import pandas as pd
@@ -37,11 +37,12 @@ class CreditCardOrganizerApp(tk.Tk):
     def create_upload_tab(self):
         label = ttk.Label(self.upload_tab, text="Upload your credit card CSV file(s):")
         label.pack(pady=20)
-        upload_btn = ttk.Button(self.upload_tab, text="Select CSV(s)", command=self.upload_csv)
-        upload_btn.pack()
-        # Clean Data button
-        clean_btn = ttk.Button(self.upload_tab, text="Clean Data", command=self.clean_data)
-        clean_btn.pack(pady=5)
+        self.upload_btn = ttk.Button(self.upload_tab, text="Select CSV(s)", command=self.upload_csv)
+        self.upload_btn.pack()
+        self.clean_btn = ttk.Button(self.upload_tab, text="Clean Data", command=self.clean_data)
+        self.clean_btn.pack(pady=5)
+        self.clean_btn.config(state=tk.DISABLED)
+        self.upload_btn.config(state=tk.NORMAL)
         # Label to show current CSV files
         self.csv_label = ttk.Label(self.upload_tab, text="No CSV loaded.")
         self.csv_label.pack(pady=10)
@@ -83,6 +84,7 @@ class CreditCardOrganizerApp(tk.Tk):
                 transactions = read_csv(file_path)
                 self.transactions_list.append(transactions)
             all_transactions = pd.concat(self.transactions_list, ignore_index=True)
+            all_transactions = merge_installments(all_transactions)
             categories_json_path = os.path.join(os.path.dirname(__file__), 'categories.json')
             if os.path.exists(categories_json_path):
                 categorizer = TransactionCategorizer(categories_json_path)
@@ -101,6 +103,8 @@ class CreditCardOrganizerApp(tk.Tk):
             self.show_stores()  # Show stores data
             self.notebook.select(self.summary_tab)
             self.processing_label.config(text="")  # Clear processing message
+            self.clean_btn.config(state=tk.NORMAL)
+            self.upload_btn.config(state=tk.DISABLED)
         except Exception as e:
             self.processing_label.config(text="")
             messagebox.showerror("Error", f"Failed to process file(s): {e}")
@@ -120,6 +124,8 @@ class CreditCardOrganizerApp(tk.Tk):
         # Reset labels
         self.csv_label.config(text="No CSV loaded.")
         self.processing_label.config(text="")
+        self.clean_btn.config(state=tk.DISABLED)
+        self.upload_btn.config(state=tk.NORMAL)
 
     def show_summary(self):
         # Only clear dynamic content, not the export button
