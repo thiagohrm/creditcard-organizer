@@ -21,14 +21,27 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
+        pip install pytest pytest-cov
 
     - name: Lint with flake8
       run: |
         pip install flake8
         flake8 src --count --select=E9,F63,F7,F82 --show-source --statistics
 
-    - name: Run tests
+    - name: Run tests with coverage
       run: |
-        pip install pytest
         export PYTHONPATH=src
-        pytest
+        pytest --cov=src --cov-report=xml --cov-report=term
+
+    - name: Upload coverage report
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage-report
+        path: coverage.xml
+
+    - name: Comment coverage on PR
+      uses: py-cov-action/python-coverage-comment-action@v3
+      with:
+        coverage-file: coverage.xml
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
