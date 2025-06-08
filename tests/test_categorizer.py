@@ -1,9 +1,5 @@
-import sys
-import os
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../src')))
-
 import pandas as pd
-from src.categorizer import TransactionCategorizer
+from categorizer import TransactionCategorizer
 
 def test_categorize_title_default():
     categorizer = TransactionCategorizer()

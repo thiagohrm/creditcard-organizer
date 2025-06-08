@@ -1,9 +1,5 @@
-import sys
-import os
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../src')))
-
 import pandas as pd
-from src.utils import read_csv, write_csv, filter_negative_transactions
+from utils import read_csv, write_csv, filter_negative_transactions
 
 def test_filter_negative_transactions(tmp_path):
     df = pd.DataFrame([
