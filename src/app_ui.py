@@ -242,14 +242,24 @@ class CreditCardOrganizerApp(tk.Tk):
         if self.categorized_transactions is None:
             return
 
-        stores = self.categorized_transactions.groupby('title')['amount'].sum().reset_index()
+        # Aggregate: sum, count, mean
+        stores = (
+            self.categorized_transactions
+            .groupby('title')
+            .agg(amount=('amount', 'sum'),
+                 count=('amount', 'count'),
+                 mean=('amount', 'mean'))
+            .reset_index()
+        )
         stores = stores.sort_values(by='amount', ascending=False)
         top_n = 15  # Show top 15 stores, group the rest as "Others"
         if len(stores) > top_n:
             top_stores = stores.iloc[:top_n]
             others = pd.DataFrame([{
                 'title': 'Others',
-                'amount': stores.iloc[top_n:]['amount'].sum()
+                'amount': stores.iloc[top_n:]['amount'].sum(),
+                'count': stores.iloc[top_n:]['count'].sum(),
+                'mean': stores.iloc[top_n:]['amount'].sum() / max(stores.iloc[top_n:]['count'].sum(), 1)
             }])
             stores = pd.concat([top_stores, others], ignore_index=True)
 
@@ -272,13 +282,21 @@ class CreditCardOrganizerApp(tk.Tk):
         # Table
         table_frame = ttk.Frame(self.stores_tab)
         table_frame.pack(fill='x', padx=10, pady=10)
-        cols = ['Store', 'Total Amount']
+        cols = ['Store', 'Total Amount', 'Transactions Count', 'Mean Amount']
         tree = ttk.Treeview(table_frame, columns=cols, show='headings', height=15)
         for col in cols:
             tree.heading(col, text=col)
             tree.column(col, anchor='center')
         for _, row in stores.iterrows():
-            tree.insert('', 'end', values=(row['title'], f"{row['amount']:.2f}"))
+            tree.insert(
+                '', 'end',
+                values=(
+                    row['title'],
+                    f"{row['amount']:.2f}",
+                    int(row['count']),
+                    f"{row['mean']:.2f}"
+                )
+            )
         tree.pack(fill='x')
 
         # Bind double-click event
