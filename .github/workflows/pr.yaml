@@ -44,4 +44,4 @@ jobs:
       with:
         coverage-file: coverage.xml
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.COMMENT_TOKEN }}
